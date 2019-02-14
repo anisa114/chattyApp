@@ -23,11 +23,24 @@ componentDidMount() {
     console.log("Connected to Server");
   });
 
-  this.socket.onmessage = (e) =>{
-    const message = JSON.parse(e.data);
+  //Handle message recieved from server
+  this.socket.onmessage = (e) => {
     const messages = this.state.messages;
-    messages.push(message);
-    this.setState({ messages})
+    const data = JSON.parse(e.data);
+    switch(data.type) {
+      case "incomingMessage":
+      messages.push(data);
+      this.setState({messages})
+        break;
+      case "incomingNotification":
+        // handle incoming notification
+        messages.push(data);
+        this.setState({messages})
+        break;
+      default:
+        // show an error in the console if the message type is unknown
+        throw new Error("Unknown event type " + data.type);
+    }
   }
   //ComponentDidMount 
   console.log("componentDidMount <App />")
@@ -42,18 +55,27 @@ componentDidMount() {
   }, 3000);
 }
 
-//changeUsername 
-changeUsername = (e) =>  {
-  const currentUser = {
-  name: e.target.value}
-  this.setState({currentUser})
-}
 
+//Handle username change when user presses enter(Send to the server)
+handleChange = (e) => {
+  if(e.key === "Enter"){
+    const currentUser = {
+        name: e.target.value }
+    const prevUser = this.state.currentUser.name;
+    this.setState({currentUser}, ()=> {
+      const usernameChange = {
+          type: "postNotification",
+          content: `${prevUser} changed their name to ${this.state.currentUser.name} `
+      }
+      this.socket.send(JSON.stringify(usernameChange));
+    });
+  }
+}
 //Send message to server
 sendMessage = (e) => {
   if(e.key === "Enter"){
     const message = {
-      type:"sendMessage",
+      type:"postMessage",
       content:e.target.value,
       username :this.state.currentUser.name
     }
@@ -62,17 +84,12 @@ sendMessage = (e) => {
   }
 }
 
-// //Method to add message 
-//  addMessage = (message) => {
-//   const oldMessages = this.state.messages;
-//   const newMessages = [...oldMessages, message];
-//   this.setState({messages: newMessages});
-// }
+
   render() {
     return (
       <div>
       <MessageList messages={this.state.messages}/>
-      <ChatBar changeUsername = {this.changeUsername} sendMessage={this.sendMessage} cuurentUser={this.state.cuurentUser} />
+      <ChatBar handleChange = {this.handleChange} changeUsername = {this.changeUsername} sendMessage={this.sendMessage} cuurentUser={this.state.cuurentUser} />
       </div>
       
     );
