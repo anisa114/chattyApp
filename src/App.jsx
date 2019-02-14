@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ChatBar from './ChatBar.jsx'
 import MessageList from './MessageList.jsx'
+import Counter from './Counter.jsx'
 
 class App extends Component {
   //Set initial state 
@@ -9,7 +10,8 @@ class App extends Component {
     //Assigning directly to state(*the only time*)
     this.state = {
       currentUser: {name: "Bob"},
-      messages:[]
+      messages:[],
+      counts:{}
     }
   }
 
@@ -20,13 +22,22 @@ componentDidMount() {
   this.socket = new WebSocket('ws://localhost:3001');
   // Connection opened
   this.socket.addEventListener('open', (e) => {
+
     console.log("Connected to Server");
+    const userCountObj = {
+      type:"UserCount",
+      content :1
+    }
+    this.socket.send(JSON.stringify(userCountObj));
+
   });
 
   //Handle message recieved from server
   this.socket.onmessage = (e) => {
     const messages = this.state.messages;
     const data = JSON.parse(e.data);
+
+   
     switch(data.type) {
       case "incomingMessage":
       messages.push(data);
@@ -36,6 +47,10 @@ componentDidMount() {
         // handle incoming notification
         messages.push(data);
         this.setState({messages})
+        break;
+        case "incomingUserCount":
+        // handle incoming notification    
+        this.setState({counts:data})
         break;
       default:
         // show an error in the console if the message type is unknown
@@ -86,8 +101,10 @@ sendMessage = (e) => {
 
 
   render() {
+    
     return (
       <div>
+        <Counter  counts={this.state.counts}/>
       <MessageList messages={this.state.messages}/>
       <ChatBar handleChange = {this.handleChange} changeUsername = {this.changeUsername} sendMessage={this.sendMessage} cuurentUser={this.state.cuurentUser} />
       </div>
