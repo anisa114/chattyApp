@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 
-
 class Message extends Component {
     render() { 
       if(this.props.message.type === "incomingNotification"){
@@ -16,7 +15,11 @@ class Message extends Component {
 ;          return(
             <div className="message">
                <span  style={colorStyle} className="message-username">{this.props.message.username}</span>
-                <span className="message-content">{this.props.message.content}</span>
+                <span className="message-content">
+                {this.props.message.content}
+                <img className="message-image" src={this.props.message.image} />
+                </span>
+                
             </div>
           );
         }
