@@ -4,14 +4,14 @@ import Message from './Message.jsx'
 
 class MessageList extends Component {
     render() {
+      
       const messages = this.props.messages.map((message) => {
-        return <Message key={message.id} message={message}/>
+        return <Message currentUser={this.props.currentUser} key={message.id} message={message}/>
       });
       return (
         <main className="messages">
-        <div>{messages}</div>
-        <div className="message system">
-        </div>
+          <div>{messages}</div>
+          <div className="message system"></div>
       </main>
       );
     }

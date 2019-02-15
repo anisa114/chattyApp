@@ -9,13 +9,15 @@ class App extends Component {
     super(props);
     //Assigning directly to state(*the only time*)
     this.state = {
-      currentUser: {name: "Bob"},
+      currentUser: {
+        name: "Bob" ,
+        color: null
+      },
       messages:[],
       counts:{}
+      
     }
   }
-
-  
   // After the constructing id done
 componentDidMount() {
   // Create WebSocket connection.
@@ -23,14 +25,26 @@ componentDidMount() {
   // Connection opened
   this.socket.addEventListener('open', (e) => {
 
+
+
     console.log("Connected to Server");
     const userCountObj = {
       type:"UserCount",
-      content :1
+      content :1,
+      username: this.state.currentUser.name
     }
     this.socket.send(JSON.stringify(userCountObj));
 
+    const userColor = {
+      type:"Color",
+      username: this.state.currentUser.name,
+      color:this.state.currentUser.color
+      
+    }
+    this.socket.send(JSON.stringify(userColor));
   });
+
+  
 
   //Handle message recieved from server
   this.socket.onmessage = (e) => {
@@ -40,9 +54,10 @@ componentDidMount() {
    
     switch(data.type) {
       case "incomingMessage":
+      console.log('incomeing', data);
       messages.push(data);
       this.setState({messages})
-        break;
+       break;
       case "incomingNotification":
         // handle incoming notification
         messages.push(data);
@@ -50,8 +65,23 @@ componentDidMount() {
         break;
         case "incomingUserCount":
         // handle incoming notification    
-        this.setState({counts:data})
+        const count = {
+          type: data.type,
+          content : data.content
+        }
+        this.setState({counts:count})
         break;
+        case "colorChange":
+        // handle incoming notification    
+        const currentUser= {
+          name: data.username,
+          color: data.color
+        }
+        console.log(currentUser);
+        this.setState({currentUser})
+        console.log(this.state.currentUser);
+        break;
+        
       default:
         // show an error in the console if the message type is unknown
         throw new Error("Unknown event type " + data.type);
@@ -59,15 +89,7 @@ componentDidMount() {
   }
   //ComponentDidMount 
   console.log("componentDidMount <App />")
-  setTimeout(() => {
-    console.log("Simulating incoming message");
-    // Add a new message to the list of messages in the data store
-    const newMessage = { id:"abc3" ,user_id: 3, username: "Michelle", content: "Hello there!"};
-    const messages = this.state.messages.concat(newMessage)
-    // Update the state of the app component.
-    // Calling setState will trigger a call to render() in App and all child components.
-    this.setState({messages: messages})
-  }, 3000);
+
 }
 
 
@@ -75,7 +97,9 @@ componentDidMount() {
 handleChange = (e) => {
   if(e.key === "Enter"){
     const currentUser = {
-        name: e.target.value }
+        name: e.target.value,
+        color:this.state.currentUser.color
+       }
     const prevUser = this.state.currentUser.name;
     this.setState({currentUser}, ()=> {
       const usernameChange = {
@@ -92,9 +116,11 @@ sendMessage = (e) => {
     const message = {
       type:"postMessage",
       content:e.target.value,
-      username :this.state.currentUser.name
+      username :this.state.currentUser.name,
+      color: this.state.currentUser.color
     }
     e.target.value = '';
+    console.log('message', message);
     this.socket.send(JSON.stringify(message));
   }
 }
@@ -105,7 +131,7 @@ sendMessage = (e) => {
     return (
       <div>
         <Counter  counts={this.state.counts}/>
-      <MessageList messages={this.state.messages}/>
+      <MessageList currentUser={this.state.currentUser} messages={this.state.messages}/>
       <ChatBar handleChange = {this.handleChange} changeUsername = {this.changeUsername} sendMessage={this.sendMessage} cuurentUser={this.state.cuurentUser} />
       </div>
       
