@@ -17,6 +17,9 @@ class App extends Component {
       counts:{}
       
     }
+    //Bindings
+    this.handleChange = this.handleChange.bind(this);
+    this.sendMessage  = this.sendMessage.bind(this);
   }
   // After the constructing id done
 componentDidMount() {
@@ -24,10 +27,8 @@ componentDidMount() {
   this.socket = new WebSocket('ws://localhost:3001');
   // Connection opened
   this.socket.addEventListener('open', (e) => {
-
-
-
     console.log("Connected to Server");
+
     const userCountObj = {
       type:"UserCount",
       content :1,
@@ -90,7 +91,7 @@ componentDidMount() {
 }
 
 //Handle username change when user presses enter(Send to the server)
-handleChange = (e) => {
+handleChange (e)  {
   if(e.key === "Enter"){
     const currentUser = {
         name: e.target.value,
@@ -107,7 +108,7 @@ handleChange = (e) => {
   }
 }
 //Send message to server
-sendMessage = (e) => {
+sendMessage (e)  {
   if(e.key === "Enter"){
     const message = {
       type:"postMessage",
@@ -119,15 +120,13 @@ sendMessage = (e) => {
     this.socket.send(JSON.stringify(message));
   }
 }
-
-
   render() {
     
     return (
       <div>
-        <Counter  counts={this.state.counts}/>
-      <MessageList currentUser={this.state.currentUser} messages={this.state.messages}/>
-      <ChatBar handleChange = {this.handleChange} changeUsername = {this.changeUsername} sendMessage={this.sendMessage} cuurentUser={this.state.cuurentUser} />
+      <Counter  counts={this.state.counts}/>
+      <MessageList messages={this.state.messages}/>
+      <ChatBar handleChange = {this.handleChange} sendMessage={this.sendMessage} cuurentUser={this.state.cuurentUser} />
       </div>
       
     );
