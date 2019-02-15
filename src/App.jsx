@@ -43,7 +43,7 @@ componentDidMount() {
     }
     this.socket.send(JSON.stringify(userColor));
   });
-
+ 
   
 
   //Handle message recieved from server
@@ -54,7 +54,6 @@ componentDidMount() {
    
     switch(data.type) {
       case "incomingMessage":
-      console.log('incomeing', data);
       messages.push(data);
       this.setState({messages})
        break;
@@ -77,9 +76,7 @@ componentDidMount() {
           name: data.username,
           color: data.color
         }
-        console.log(currentUser);
         this.setState({currentUser})
-        console.log(this.state.currentUser);
         break;
         
       default:
@@ -91,7 +88,6 @@ componentDidMount() {
   console.log("componentDidMount <App />")
 
 }
-
 
 //Handle username change when user presses enter(Send to the server)
 handleChange = (e) => {
@@ -120,7 +116,6 @@ sendMessage = (e) => {
       color: this.state.currentUser.color
     }
     e.target.value = '';
-    console.log('message', message);
     this.socket.send(JSON.stringify(message));
   }
 }

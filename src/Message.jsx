@@ -13,7 +13,6 @@ class Message extends Component {
           const colorStyle = {
             color: this.props.message.color
           }
-          console.log("Color style is", colorStyle)
 ;          return(
             <div className="message">
                <span  style={colorStyle} className="message-username">{this.props.message.username}</span>
