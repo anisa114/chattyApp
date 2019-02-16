@@ -4,8 +4,9 @@ function Counter(props)  {
     return (
       <nav className="navbar">
         <a href="/" className="navbar-brand">Chatty</a>
-        <div>
-            <span className="counter">{props.counts.content} users online</span>
+        <img id="smiley" src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/320/microsoft/153/smiling-face-with-smiling-eyes_1f60a.png"/>
+        <div className="counter" >
+            <span >{props.counts.content} users online</span>
         </div>
       </nav>
     );

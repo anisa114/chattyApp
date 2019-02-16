@@ -10,16 +10,18 @@ function Message(props)  {
       }  else {
           const colorStyle = {
             color: props.message.color
-          }
-;          return(
-            <div className="message">
-               <span  style={colorStyle} className="message-username">{props.message.username}</span>
-                <span className="message-content">
-                {props.message.content}
-                {props.message.image && <img className="message-image" src={props.message.image} />}
-                </span>
-            </div>
-          );
+          };          
+            return(
+              <div >
+                <div className="message">
+                  <span  style={colorStyle} className="message-username">{props.message.username}</span>
+                    <span className="message-content">
+                    {props.message.content}
+                    </span>
+                </div>
+                  {props.message.image && <img className="message-image" src={props.message.image} />}
+              </div>
+            );
         }
         
   }
