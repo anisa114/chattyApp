@@ -10,7 +10,7 @@ class App extends Component {
     //Assigning directly to state(*the only time*)
     this.state = {
       currentUser: {
-        name: "Bob" ,
+        name: "User" ,
         color: null
       },
       messages:[],
