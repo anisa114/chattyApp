@@ -20,3 +20,4 @@ open http://localhost:3000
 * [webpack-dev-server](https://github.com/webpack/webpack-dev-server)
 
 ### Screenshot
+!["Screenshot of chatty"](https://github.com/anisa114/chattyApp/blob/master/docs/Chatty.jpeg)
