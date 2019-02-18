@@ -121,7 +121,6 @@ sendMessage (e)  {
   }
 }
   render() {
-    
     return (
       <div>
       <Counter  counts={this.state.counts}/>
