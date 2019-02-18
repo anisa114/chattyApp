@@ -28,31 +28,12 @@ componentDidMount() {
   // Connection opened
   this.socket.addEventListener('open', (e) => {
     console.log("Connected to Server");
-
-    const userCountObj = {
-      type:"UserCount",
-      content :1,
-      username: this.state.currentUser.name
-    }
-    this.socket.send(JSON.stringify(userCountObj));
-
-    const userColor = {
-      type:"Color",
-      username: this.state.currentUser.name,
-      color:this.state.currentUser.color
-      
-    }
-    this.socket.send(JSON.stringify(userColor));
   });
- 
-  
-
   //Handle message recieved from server
   this.socket.onmessage = (e) => {
     const messages = this.state.messages;
     const data = JSON.parse(e.data);
 
-   
     switch(data.type) {
       case "incomingMessage":
       messages.push(data);
@@ -125,7 +106,7 @@ sendMessage (e)  {
       <div>
       <Counter  counts={this.state.counts}/>
       <MessageList messages={this.state.messages}/>
-      <ChatBar handleChange = {this.handleChange} sendMessage={this.sendMessage} cuurentUser={this.state.cuurentUser} />
+      <ChatBar handleChange = {this.handleChange} sendMessage={this.sendMessage} />
       </div>
       
     );

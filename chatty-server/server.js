@@ -28,19 +28,55 @@ const colors = ["red", "blue", "green", "purple"];
 wss.on('connection', (ws) => {
     //Regular expression
     const regex = /(https?:\/\/.*\.(?:png|jpg|gif))/gi
-    //Count how many users are connected
-    const userCount = wss.clients.size;
     // Broadcast to all.
     wss.broadcast = function broadcast(data) {
         wss.clients.forEach(function each(client) {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(data);
-        }
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(data);
+            }
         });
     };
-  console.log('Client connected');
+    console.log('Client connected');
 
-  //Recieve message from the client 
+   //Count how many users are connected
+    const userCount = {
+        type: "incomingUserCount",
+        content: wss.clients.size
+    }
+    wss.broadcast(JSON.stringify(userCount));
+
+    let color = null;
+    let username = "User"
+    if(!userSockets.length){
+        color = colors[Math.floor(Math.random()*colors.length)];
+    }
+    else {
+       for(let i =0;i < userSockets.length; i++){
+           //if user does not exist in array userSockets
+               if(userSockets[i].id !== ws._socket._handle.fd){
+                   color = colors[Math.floor(Math.random()*colors.length)];
+                    break;
+                } else {
+                    color = userSockets[i].color;
+                }
+               
+        }
+    }
+    //Colorchange sent back to client
+    const colorChange = {
+        type:"colorChange",
+        username: username,
+        color: color
+    }
+    ws.send(JSON.stringify(colorChange));
+    //Color and id history
+    const clientID = ws._socket._handle.fd;
+    const userColor = {
+        id: clientID,
+        color: color
+    }
+    userSockets.push(userColor);
+    //Recieve message from the client 
     ws.on("message", data => {
         const info = JSON.parse(data);
         const dataType = info.type;
@@ -56,7 +92,7 @@ wss.on('connection', (ws) => {
                 id : uuid(),
                 username: info.username,
                 content: messageContent,
-                color: info.color,
+                color: color,
                 image : imageUrl
             }
             
@@ -71,48 +107,7 @@ wss.on('connection', (ws) => {
             }
             // Broadcast to all connected users and send back Message with id
             wss.broadcast(JSON.stringify(notificationSendBack));
-            break;
-
-            case "UserCount":
-            const count = {
-                type: "incomingUserCount",
-                content: userCount,
-            }
-            wss.broadcast(JSON.stringify(count));
-            break;
-
-            case "Color":
-                if(!userSockets.length){
-                    info.color = colors[Math.floor(Math.random()*colors.length)];
-                }
-                else {
-                    for(let i =0;i < userSockets.length; i++){
-                        //if user does not exist in array userSockets
-                        if(userSockets[i].id !== ws._socket._handle.fd){
-                            info.color = colors[Math.floor(Math.random()*colors.length)];
-                           break;
-                        }
-                        else {
-                            info.color = userSockets[i].color;
-                        }
-                    }
-                }
-                //Colorchange sent back to client
-                const colorChange = {
-                    type:"colorChange",
-                    username: info.username,
-                    color: info.color
-                }
-                ws.send(JSON.stringify(colorChange));
-                //Color and id history
-                const clientID = ws._socket._handle.fd;
-                const userColor = {
-                    id: clientID,
-                    color: info.color
-                }
-                userSockets.push(userColor);
-                break;
-           
+            break;           
             default:
             // show an error in the console if the message type is unknown
             throw new Error("Unknown event type " + dataType);
